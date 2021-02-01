@@ -1,5 +1,8 @@
-from cc import Lexer
+from cc import Lexer, Parser
 
-with open('./test.txt') as f:
-    # print(repr(f.read()))
-    print(Lexer(f.read()).make_tokens())
+# with open('./test.txt') as f:
+#     # print(repr(f.read()))
+#     print(Lexer(f.read()).make_tokens())
+# print("====================")
+print(Parser(["v", "ASSIGN", "5","SEMCOL", "LP", '2', "PLUS", "v", "RP", "MUL", "5", "SEMCOL"]).parse())
+

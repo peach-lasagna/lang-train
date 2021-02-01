@@ -1,26 +1,29 @@
 """
 v =       123;
-f ( 123 ) -> { v = 213; return 132; }
 
 """
+def error(msg: str):
+    print(msg)
+    sys.exit(1)
+
 import sys
 class Lexer:
-    def __init__(self, text: str) -> list[str]:
+    def __init__(self, text: str):
         self.text = text
-    def make_tokens(self):
+    def make_tokens(self) -> list[str]:
         chars = {
-            "(": "STPAR",
-            ")": "ENDPAR",
-            "{": "STFUN",
-            "}": "ENDFUN",
+            "(": "LP",
+            ")": "RP",
             "=": "ASSIGN",
-            "\n": "NEWLINE",
             ";": "SEPCOL",
-            "+": "PLUS"
+            "+": "PLUS",
+            "*": "MUL",
+            "-": "MINUS",
+            "/": "DIV"
         }
         WORDS = {
             "return": "RETURN",
-            "->": 'DO'
+            "var": "VAR"
         }
         DIGITS = "1234567809"
         aplpha = "qwertyuioplkjhgfdsazxcvbnm"
@@ -42,6 +45,68 @@ class Lexer:
         return tokens
 
 class Parser:
-    def __init__(self, lexer: Lexer):
-        self.lexer = lexer
+    def __init__(self, tokens: list[str]):
+        self.tokens = tokens
+        self.tok_ind = 0
+        self.vars = {}
+
+    def parse(self):
+        res = self.expr()
+        if self.tok_ind != len(self.tokens):
+            error(f"ParseError in exp {self.tokens[self.tok_ind]}")
+        return res
+
+    def expr(self):
+        first = self.term()
+        while self.tok_ind < len(self.tokens):
+            operator = self.tokens[self.tok_ind]
+            if not operator == "PLUS" and not operator == "MINUS":
+                break
+            else:
+                self.tok_ind += 1
+            # находим второе слагаемое (вычитаемое)
+            second = self.term()
+            if operator == "PLUS":
+                first += second
+            else:
+                first -= second
+        return first
+
+    def term(self):
+        first = self.factor()
+        while self.tok_ind < len(self.tokens):
+            operator = self.tokens[self.tok_ind]
+            if not operator == "MUL" and not operator == "DIV":
+                break
+            else:
+                self.tok_ind += 1
+
+            # находим второе слагаемое (вычитаемое)
+            second = self.factor()
+            if operator == "MUL":
+                first *= second
+            else:
+                first /= second
+        return first
+
+    def factor(self):
+        next = self.tokens[self.tok_ind]
+        result = 0
+        if next == "LP":
+            self.tok_ind += 1
+            result = self.expr()
+            closingBracket = ''
+            if self.tok_ind < len(self.tokens):
+                closingBracket = self.tokens[self.tok_ind]
+            else:
+                error("Unexpected end of expression")
+            if self.tok_ind < len(self.tokens) and closingBracket == 'RP':
+                self.tok_ind += 1
+                return result
+            error("')' expected but " + closingBracket)
+        self.tok_ind += 1
+        try:
+            return float(self.vars.get(next, next))
+        except ValueError:
+            error(f"var {next} is not definded")
 
