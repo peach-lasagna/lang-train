@@ -114,18 +114,18 @@ class Parser:
     def __init__(self, tokens):
         self.pos = 0
         self.tokens = tokens
-        self.vars: dict[str, float] = {}
+        self.vars: dict[str, float] = {} # {"varname": "value"}
 
     def parse(self):
         while self.pos < len(self.tokens):
             t = self.tokens[self.pos]
             if t == "ASSIGN":
-                var = self.pos -1
+                varname = self.pos -1
                 __t = []
                 while self.tokens[self.pos] != "SEPCOL":
                     self.pos+=1
                     print(self.tokens[self.pos], self.pos)
                     __t.append(self.tokens[self.pos])
                 val = ExpParser(__t, self.vars)
-                self.vars[self.tokens[var]] = val.parse()
+                self.vars[self.tokens[varname]] = val.parse()
             self.pos +=1
