@@ -44,11 +44,11 @@ class Lexer:
                 stack = ''
         return tokens
 
-class Parser:
-    def __init__(self, tokens: list[str]):
+class ExpParser:
+    def __init__(self, tokens: list[str], vars):
         self.tokens = tokens
         self.tok_ind = 0
-        self.vars = {}
+        self.vars: dict[str, float] = vars
 
     def parse(self):
         res = self.expr()
@@ -110,3 +110,22 @@ class Parser:
         except ValueError:
             error(f"var {next} is not definded")
 
+class Parser:
+    def __init__(self, tokens):
+        self.pos = 0
+        self.tokens = tokens
+        self.vars: dict[str, float] = {}
+
+    def parse(self):
+        while self.pos < len(self.tokens):
+            t = self.tokens[self.pos]
+            if t == "ASSIGN":
+                var = self.pos -1
+                __t = []
+                while self.tokens[self.pos] != "SEPCOL":
+                    self.pos+=1
+                    print(self.tokens[self.pos], self.pos)
+                    __t.append(self.tokens[self.pos])
+                val = ExpParser(__t, self.vars)
+                self.vars[self.tokens[var]] = val.parse()
+            self.pos +=1
