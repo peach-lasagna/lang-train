@@ -23,7 +23,8 @@ class Lexer:
         }
         WORDS = {
             "return": "RETURN",
-            "var": "VAR"
+            "var": "VAR",
+            "=>"
         }
         DIGITS = "1234567809"
         aplpha = "qwertyuioplkjhgfdsazxcvbnm"
@@ -52,8 +53,8 @@ class ExpParser:
 
     def parse(self):
         res = self.expr()
-        if self.tok_ind != len(self.tokens):
-            error(f"ParseError in exp {self.tokens[self.tok_ind]}")
+        # if self.tok_ind != len(self.tokens):
+        #     error(f"ParseError in exp {self.tokens[self.tok_ind]}")
         return res
 
     def expr(self):
@@ -124,8 +125,8 @@ class Parser:
                 __t = []
                 while self.tokens[self.pos] != "SEPCOL":
                     self.pos+=1
-                    print(self.tokens[self.pos], self.pos)
                     __t.append(self.tokens[self.pos])
                 val = ExpParser(__t, self.vars)
                 self.vars[self.tokens[varname]] = val.parse()
             self.pos +=1
+        return self.vars

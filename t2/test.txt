@@ -1,6 +1,0 @@
-var v = 123;
-var v =   123;
-foo f () -> { return 1243; }
-foo g(  )->{123;}
-foo h()->{}
-
